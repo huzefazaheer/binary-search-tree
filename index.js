@@ -4,98 +4,122 @@ class Node{
         this.rightNode = null
         this.leftNode = null
     }
+
+    // constructor(value = null, leftNode = null, rightNode = null){
+    //     this.value = value
+    //     this.rightNode = rightNode
+    //     this.leftNode = leftNode
+    // }
 }
 
-function createBinaryTree(){
+function createBST(){
+
     let tree = new Node()
-    
-    function buildTree (arr){
-        while (arr.length >1) {
-            let mid1 = Math.round(arr.length / 2)
-            insert(arr[mid1])
-            let tmp = arr.splice(mid1, arr.length)
-            arr = arr.splice(0, mid1)
-            buildTree(tmp)
+
+    const prettyPrint = (node = tree, prefix = "", isLeft = true) => {
+        if (node === null) {
+          return;
+        }
+        if (node.rightNode !== null) {
+          prettyPrint(node.rightNode, `${prefix}${isLeft ? "│   " : "    "}`, false);
+        }
+        console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.value}`);
+        if (node.leftNode !== null) {
+          prettyPrint(node.leftNode, `${prefix}${isLeft ? "    " : "│   "}`, true);
+        }
+      };
+     
+
+    function buildTree(arr){
+        arr = arr.sort(function(a, b){return a-b})
+        let midval
+        if(arr.length > 0){
+            if(arr.length == 1){
+                insert (arr[0])
+            }else{
+                midval = arr[Math.round(arr.length/2)]
+                insert (midval)
+                buildTree(arr.splice(0, Math.round(arr.length/2)))
+                buildTree(arr.splice(Math.round(arr.length/2), arr.length))
+            }
         }
     }
 
     function insert(value, node = tree){
-        if(node.value == null){
+        if (node.value == null) {
             node.value = value
-            return
-        }
-        if(node.value > value){
-            if(node.leftNode == null){
-                node.leftNode = new Node(value)
-                return
-            }else return insert(value, node.leftNode)
-        }else{
-            if(node.rightNode == null){
-                node.rightNode = new Node(value)
-                return
-            }else return insert(value, node.rightNode)   
-        }
-    }
-
-    function levelOrder(fn, node = tree){
-        if(node.leftNode == null){
-            fn(node)
         }else {
-            levelOrder(fn, node.leftNode)
+            if(node.value != value){
+                if(node.value > value){
+                    if(node.leftNode == null) node.leftNode = new Node(value)
+                    else return insert(value, node.leftNode)
+                }else{
+                    if(node.rightNode == null) node.rightNode = new Node(value)
+                    else return insert(value, node.rightNode)
+                }
+            }
         }
-        if(node.rightNode == null){
-            fn(node)
+    }
+
+    function deleteItem(value, node = tree, prevnode = tree){
+        if(node.value == value){
+            let tmp = node
+            if(node.leftNode == null && node.rightNode == null){
+                // no children
+                if(prevnode.leftNode == node){
+                    prevnode.leftNode = null
+                }else prevnode.rightNode = null
+
+            }else if(node.rightNode == null){
+                // one child
+                if(prevnode.leftNode == node){
+                    prevnode.leftNode = node.leftNode
+                }else prevnode.rightNode = node.leftNode
+
+            }else if(node.leftNode == null){
+                // one child
+                if(prevnode.leftNode == node){
+                    prevnode.leftNode = node.rightNode
+                }else prevnode.rightNode = node.rightNode
+
+            }else{
+                // two children
+                let i = node.leftNode
+                let previ = i
+                while(i.rightNode){
+                    previ = i
+                    i = i.rightNode
+                }
+                node.value = i.value
+                if(previ.leftNode == i){
+                    previ.leftNode = i.rightNode
+                }else previ.rightNode = i.rightNode
+            }
         }else{
-            levelOrder(fn, node.rightNode)
+            if(node.value > value && node.leftNode != null) return deleteItem(value, node.leftNode, node)
+            if(node.value < value && node.rightNode != null) return deleteItem(value, node.rightNode, node)
         }
     }
 
-    function deleteItem(value, node = tree){
-        if(node.leftNode != null && node.leftNode.value == value){
-            tmp = node.leftNode
+    function find(value, node = tree){
+        if(node.value == value){
+            return node
+        }else{
+            if(node.value > value && node.leftNode != null) return find(value, node.leftNode)
+            if(node.value < value && node.rightNode != null) return find(value, node.rightNode)
         }
     }
 
-    function find(){
 
-    }
-
-    function inOrder(){
-
-    }
-
-    function preOrder(){
-
-    }
-    
-    function postOrder(){
-
-    }
-
-    function height(){
-
-    }
-
-    function depth(){
-
-    }
-
-    function isBalanced(){
-
-    }
-
-    function reBalance(){
-
-    }
-
-    return {buildTree, insert, levelOrder, find}
-
+    return {insert, buildTree, deleteItem, find, prettyPrint}
 }
+
 
 let data = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
 
-let binaryTree = createBinaryTree();
-binaryTree.buildTree(data)
-// binaryTree.levelOrder(console.log)
-binaryTree.find(23)
-// console.log(binaryTree.tree)
+const bst = createBST()
+bst.buildTree(data)
+bst.prettyPrint()
+bst.deleteItem(8)
+bst.prettyPrint()
+
