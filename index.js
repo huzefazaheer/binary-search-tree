@@ -4,12 +4,6 @@ class Node{
         this.rightNode = null
         this.leftNode = null
     }
-
-    // constructor(value = null, leftNode = null, rightNode = null){
-    //     this.value = value
-    //     this.rightNode = rightNode
-    //     this.leftNode = leftNode
-    // }
 }
 
 function createBST(){
@@ -110,16 +104,142 @@ function createBST(){
         }
     }
 
+    function inOrder(fn, node = tree){
+        if(node.leftNode){
+            inOrder(fn, node.leftNode)
+        }
+        fn(node.value)
+        if(node.rightNode){
+            inOrder(fn, node.rightNode)
+        }
+    }
 
-    return {insert, buildTree, deleteItem, find, prettyPrint}
+    function preOrder(fn, node = tree){
+        fn(node.value)
+        if(node.leftNode){
+            preOrder(fn, node.leftNode)
+        }
+        if(node.rightNode){
+            preOrder(fn, node.rightNode)
+        }
+    }
+
+    function postOrder(fn, node = tree){ 
+        if(node.leftNode){
+            postOrder(fn, node.leftNode)
+        }
+        if(node.rightNode){
+            postOrder(fn, node.rightNode)
+        }
+        fn(node.value)
+    }
+
+    function levelOrder(fn, node = tree) {
+        if (!node) return;
+    
+        let queue = [];
+        queue.push(node);
+    
+        while (queue.length > 0) {
+            let node = queue.shift();
+            fn(node.value)
+    
+            if (node.leftNode) queue.push(node.leftNode);
+            if (node.rightNode) queue.push(node.rightNode);
+        }
+    }
+
+    function reBalance(){
+        let ans = [];
+        let s = [];
+        let curr = tree;
+
+    while (curr !== null || s.length > 0) {
+
+        // Reach the left most Node of the curr Node
+        while (curr !== null) {
+
+            // Place pointer to a tree node on
+            // the stack before traversing
+            // the node's left subtree
+            s.push(curr);
+            curr = curr.leftNode;
+        }
+
+        // Current must be NULL at this point
+        curr = s.pop();
+        ans.push(curr.value);
+
+        // we have visited the node and its
+        // left subtree. Now, it's right
+        // subtree's turn
+        curr = curr.rightNode;
+    }
+
+        tree = new Node()
+        buildTree(ans)
+    }
+
+    function getDepth(value, node = tree, depth = 0){
+        if(node.value == value){
+            return depth
+        }else{
+            if(node.value > value && node.leftNode != null) return getDepth(value, node.leftNode, depth + 1)
+            if(node.value < value && node.rightNode != null) return getDepth(value, node.rightNode, depth + 1)
+        }
+    }
+
+    function getHeight(value){
+        let node = find(value)
+        let height = 0
+        if(node.leftNode != null) height = height + 1
+        if(node.rightNode != null) height = height + 1
+        return height
+    }
+
+    function getNodeHeight(node){
+        if (node == null) return 0
+        let height = 0
+        if(node.leftNode != null) height = height + 1
+        if(node.rightNode != null) height = height + 1
+        return height
+    }
+
+    function isBalanced(node = tree){
+        if (node === null)
+            return true;
+
+        let lHeight = getDepth(node.leftNode.value);
+        let rHeight = getDepth(node.rightNode.value);
+        console.log(lHeight)
+        console.log(rHeight)
+        if (Math.abs(lHeight - rHeight) > 1)
+            return false;
+
+        return isBalanced(node.leftNode) && isBalanced(node.rightNode);
+    }
+
+
+    return {insert, buildTree, deleteItem, find, prettyPrint, inOrder, preOrder, postOrder, levelOrder, reBalance, getHeight, getDepth, isBalanced}
 }
 
 
-let data = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]
+let data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 const bst = createBST()
 bst.buildTree(data)
 bst.prettyPrint()
-bst.deleteItem(8)
+console.log(bst.isBalanced())
+bst.insert(101)
+bst.insert(200)
+bst.insert(500)
+bst.insert(600)
+bst.insert(5000)
 bst.prettyPrint()
-
+console.log(bst.isBalanced())
+bst.reBalance()
+bst.prettyPrint()
+console.log(bst.isBalanced())
+// bst.inOrder(console.log)
+// bst.preOrder(console.log)
+// bst.postOrder(console.log)
