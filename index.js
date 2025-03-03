@@ -180,55 +180,54 @@ function createBST(){
         buildTree(ans)
     }
 
-    function getDepth(value, node = tree, depth = 0){
+    function getDepth(value, node = tree, x = 0){
         if(node.value == value){
-            return depth
+            console.log(x)
+            return x
         }else{
-            if(node.value > value && node.leftNode != null) return getDepth(value, node.leftNode, depth + 1)
-            if(node.value < value && node.rightNode != null) return getDepth(value, node.rightNode, depth + 1)
+            if(node.value > value && node.leftNode != null) return getDepth(value, node.leftNode, x = x+1)
+            if(node.value < value && node.rightNode != null) return getDepth(value, node.rightNode, x = x +1)
         }
+    }  
+
+    function getHeight(node){
+        let queue = []
+        let i =0
+        if (node != null)queue.push(node)
+            else return 0
+        while(queue.length > 0){
+            let tmp = queue.shift()
+            if(tmp.leftNode != null) queue.push(tmp.leftNode)
+            if(tmp.rightNode != null) queue.push(tmp.rightNode)
+            i++
+            
+        }
+        return(Math.ceil(i/2))
     }
 
-    function getHeight(value){
-        let node = find(value)
-        let height = 0
-        if(node.leftNode != null) height = height + 1
-        if(node.rightNode != null) height = height + 1
-        return height
-    }
-
-    function getNodeHeight(node){
-        if (node == null) return 0
-        let height = 0
-        if(node.leftNode != null) height = height + 1
-        if(node.rightNode != null) height = height + 1
-        return height
-    }
 
     function isBalanced(node = tree){
-        if (node === null)
-            return true;
+        if (node === null) return true;
 
-        let lHeight = getDepth(node.leftNode.value);
-        let rHeight = getDepth(node.rightNode.value);
-        console.log(lHeight)
-        console.log(rHeight)
-        if (Math.abs(lHeight - rHeight) > 1)
+        let lHeight = getHeight(node.leftNode);
+        let rHeight = getHeight(node.rightNode);
+        if (Math.abs(lHeight - rHeight) > 1){
             return false;
-
+        }
         return isBalanced(node.leftNode) && isBalanced(node.rightNode);
     }
 
 
-    return {insert, buildTree, deleteItem, find, prettyPrint, inOrder, preOrder, postOrder, levelOrder, reBalance, getHeight, getDepth, isBalanced}
+    return {insert, buildTree, deleteItem, find, prettyPrint, inOrder, preOrder, postOrder, levelOrder, reBalance, getHeight, getDepth, isBalanced, tree}
 }
 
 
-let data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+let data = [5, 11, 9, 8, 55, 44, 2, 6]
 
 const bst = createBST()
 bst.buildTree(data)
 bst.prettyPrint()
+bst.getDepth(2)
 console.log(bst.isBalanced())
 bst.insert(101)
 bst.insert(200)
