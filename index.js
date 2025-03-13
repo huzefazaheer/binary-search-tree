@@ -26,17 +26,16 @@ function createBST(){
 
     function buildTree(arr){
         arr = arr.sort(function(a, b){return a-b})
-        let midval
-        if(arr.length > 0){
-            if(arr.length == 1){
-                insert (arr[0])
-            }else{
-                midval = arr[Math.round(arr.length/2)]
-                insert (midval)
-                buildTree(arr.splice(0, Math.round(arr.length/2)))
-                buildTree(arr.splice(Math.round(arr.length/2), arr.length))
-            }
+        if (arr.length== 1 ) {
+            insert (arr[0])
+            return
         }
+        let midval = arr[Math.floor(arr.length/2)]
+        insert (midval)
+        let lArr = arr.splice(0, Math.floor(arr.length/2))
+        let rArr = arr.splice(arr.indexOf(midval) + 1, arr.length)
+        if (lArr.length > 0) buildTree(lArr)
+        if (rArr.length > 0) buildTree(rArr)
     }
 
     function insert(value, node = tree){
@@ -149,40 +148,27 @@ function createBST(){
         }
     }
 
-    function reBalance(){
-        let ans = [];
-        let s = [];
-        let curr = tree;
+    async function reBalance(node = tree){
 
-    while (curr !== null || s.length > 0) {
-
-        // Reach the left most Node of the curr Node
-        while (curr !== null) {
-
-            // Place pointer to a tree node on
-            // the stack before traversing
-            // the node's left subtree
-            s.push(curr);
-            curr = curr.leftNode;
+        let queue = [], arr = []
+        let i =0
+        if (node != null)queue.push(node)
+            else return 0
+        while(queue.length > 0){
+            let tmp = queue.shift()
+            arr.push(tmp.value)
+            if(tmp.leftNode != null) queue.push(tmp.leftNode)
+            if(tmp.rightNode != null) queue.push(tmp.rightNode)
+            i++
+            
         }
 
-        // Current must be NULL at this point
-        curr = s.pop();
-        ans.push(curr.value);
-
-        // we have visited the node and its
-        // left subtree. Now, it's right
-        // subtree's turn
-        curr = curr.rightNode;
-    }
-
         tree = new Node()
-        buildTree(ans)
+        buildTree(arr)
     }
 
     function getDepth(value, node = tree, x = 0){
         if(node.value == value){
-            console.log(x)
             return x
         }else{
             if(node.value > value && node.leftNode != null) return getDepth(value, node.leftNode, x = x+1)
@@ -191,18 +177,12 @@ function createBST(){
     }  
 
     function getHeight(node){
-        let queue = []
-        let i =0
-        if (node != null)queue.push(node)
-            else return 0
-        while(queue.length > 0){
-            let tmp = queue.shift()
-            if(tmp.leftNode != null) queue.push(tmp.leftNode)
-            if(tmp.rightNode != null) queue.push(tmp.rightNode)
-            i++
-            
+
+        if(node == null){
+            return - 1
         }
-        return(Math.ceil(i/2))
+
+        return Math.max(getHeight(node.leftNode), getHeight(node.rightNode)) + 1
     }
 
 
@@ -211,6 +191,7 @@ function createBST(){
 
         let lHeight = getHeight(node.leftNode);
         let rHeight = getHeight(node.rightNode);
+        // console.log(node.value, lHeight, rHeight, lHeight - rHeight)
         if (Math.abs(lHeight - rHeight) > 1){
             return false;
         }
@@ -239,6 +220,6 @@ console.log(bst.isBalanced())
 bst.reBalance()
 bst.prettyPrint()
 console.log(bst.isBalanced())
-// bst.inOrder(console.log)
+bst.inOrder(console.log)
 // bst.preOrder(console.log)
 // bst.postOrder(console.log)
